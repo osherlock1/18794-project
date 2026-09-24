@@ -2,3 +2,4 @@
 venv
 !*/.gitkeep
 data/*
+__pycache__

@@ -3,3 +3,4 @@ venv
 !*/.gitkeep
 data/*
 __pycache__
+*.egg-info

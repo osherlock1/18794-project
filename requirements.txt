@@ -1,8 +1,4 @@
 appnope==1.0.0
-<<<<<<< HEAD
-=======
--e git+ssh://git@github.com/osherlock1/18794-project.git@39fb794fabb65b74485e294b64bcbfa1eea2138a#egg=asl_signs_project
->>>>>>> 94080b5875bf6d81344cd8f900dc5569fd2b6b7c
 asttokens==3.0.2
 attrs==26.1.0
 bleach==6.4.0

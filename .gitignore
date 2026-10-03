@@ -4,3 +4,5 @@ venv
 data/*
 __pycache__
 *.egg-info
+/build
+notes.txt

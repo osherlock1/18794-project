@@ -108,3 +108,16 @@ def plot_hand(
     ax.set_xlabel("Normalized x")
     ax.set_ylabel("Normalized y")
     ax.grid(alpha=0.15)
+
+
+def visualize_loss(train_losses, test_losses):
+    plt.figure(figsize=(6, 4))
+    plt.plot(train_losses, label="Train")
+    plt.plot(test_losses, label="Validation")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Train and Validation Losses\n")
+    plt.legend()
+    plt.tight_layout()
+    plt.grid()
+    plt.show()

@@ -18,7 +18,7 @@ DATASET_PATH = BASE_PATH / "data" / "asl-signs" / "cleaned"
 def main():
     dataset = ASLDataset(DATASET_PATH)
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "mps" if torch.mps.is_available() else "cpu"
     print(f"Device: {device}")
 
     train_size = int(0.9 * len(dataset))

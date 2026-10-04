@@ -13,6 +13,8 @@ TRAIN_CSV_PATH = DATASET_PATH / "train.csv"
 CLEANED_FILE_NAME = "sequences.npy"
 CLEANED_SAVE_PATH = BASE_PATH / "data" / "asl-signs" / "cleaned"
 
+N_FRAME = 64
+
 
 def main():
     os.makedirs(CLEANED_SAVE_PATH, exist_ok=True)
@@ -34,7 +36,7 @@ def main():
         CLEANED_SAVE_PATH / CLEANED_FILE_NAME,
         mode="w+",
         dtype=np.float32,
-        shape=(len(train_df), 24, 1086),
+        shape=(len(train_df), N_FRAME, 1086),
     )
 
     print("Data cleaning started...")
@@ -44,9 +46,9 @@ def main():
         file_path = BASE_PATH / "data" / "asl-signs" / path
         p_df = pd.read_parquet(file_path)
         frame_data = get_frames(p_df)
-        sequence = resize_sequence(frame_data)
+        sequence = resize_sequence(frame_data, N_FRAME)
 
-        if sequence.shape != (24, 1086):
+        if sequence.shape != (N_FRAME, 1086):
             raise ValueError(f"Unexpected sequence shape at row{i}")
 
         x[i] = sequence

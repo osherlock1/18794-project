@@ -8,7 +8,7 @@ from src.models import CNNBase
 from src.training import train
 
 BATCH_SIZE = 64
-LR = 10**-2
+LR = 1e-4
 EPOCHS = 30
 
 BASE_PATH = Path()

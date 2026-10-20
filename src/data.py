@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 
 
-def get_frames(parquet_frame: pd.DataFrame) -> pd.DataFrame:
+def get_frames(parquet_frame: pd.DataFrame, exclude_types=("face",)) -> pd.DataFrame:
+    parquet_frame = parquet_frame[~parquet_frame["type"].isin(exclude_types)]
     frames = []
 
     for _, frame_df in parquet_frame.groupby("frame", sort=True):

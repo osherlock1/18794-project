@@ -7,7 +7,7 @@ import pandas as pd
 
 from src.data import get_frames, resize_sequence
 
-BASE_PATH = Path()
+BASE_PATH = Path(__file__).parent
 DATASET_PATH = BASE_PATH / "data" / "asl-signs"
 TRAIN_CSV_PATH = DATASET_PATH / "train.csv"
 CLEANED_FILE_NAME = "sequences.npy"

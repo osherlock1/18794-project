@@ -7,11 +7,12 @@ import pandas as pd
 
 from src.data import get_frames, resize_sequence
 
-BASE_PATH = Path(__file__).parent
+BASE_PATH = Path(__file__).parent.parent
 DATASET_PATH = BASE_PATH / "data" / "asl-signs"
 TRAIN_CSV_PATH = DATASET_PATH / "train.csv"
-CLEANED_FILE_NAME = "sequences.npy"
+CLEANED_FILE_NAME = "sequences_noface.npy"
 CLEANED_SAVE_PATH = BASE_PATH / "data" / "asl-signs" / "cleaned"
+N_FEATURES = 150
 
 N_FRAME = 64
 
@@ -36,7 +37,7 @@ def main():
         CLEANED_SAVE_PATH / CLEANED_FILE_NAME,
         mode="w+",
         dtype=np.float32,
-        shape=(len(train_df), N_FRAME, 1086),
+        shape=(len(train_df), N_FRAME, N_FEATURES),
     )
 
     print("Data cleaning started...")
@@ -48,7 +49,7 @@ def main():
         frame_data = get_frames(p_df)
         sequence = resize_sequence(frame_data, N_FRAME)
 
-        if sequence.shape != (N_FRAME, 1086):
+        if sequence.shape != (N_FRAME, N_FEATURES):
             raise ValueError(f"Unexpected sequence shape at row{i}")
 
         x[i] = sequence

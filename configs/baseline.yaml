@@ -1,9 +1,9 @@
 data_file_name: sequences_noface.npy
 
-model: 'CNNTransformer' # match with the keys in MODELS in run_training.py
+model: 'CNNTransformer' # match with the keys in MODELS in run_training.py (this goes for optimizer and criterion)
 device: 'mps'
 batch_size: 64
-epochs: 5
+epochs: 50
 seed: 42
 
 optimizer:

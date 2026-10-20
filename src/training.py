@@ -37,14 +37,25 @@ def evaluate_accuracy(model, dataloader, device):
     return accuracy
 
 
-def train(model, optimizer, criterion, trainloader, valloader, epochs, device):
+def train(
+    model,
+    optimizer,
+    criterion,
+    trainloader,
+    valloader,
+    epochs,
+    device,
+    on_epoch_end=None,
+):
     train_losses = []
-    test_losses = []
+    val_losses = []
 
     model.to(device)
 
     for epoch in range(epochs):
         running_loss = 0.0
+        running_correct = 0
+        running_total = 0
         model.train()
 
         for inputs, labels in tqdm(trainloader, desc="Training"):
@@ -57,16 +68,32 @@ def train(model, optimizer, criterion, trainloader, valloader, epochs, device):
             optimizer.step()
 
             running_loss += loss.item()
+            running_correct += (outputs.argmax(dim=1) == labels).sum().item()
+            running_total += labels.size(0)
 
         train_loss = running_loss / len(trainloader)
         train_losses.append(train_loss)
         print(f"Epoch {epoch + 1}/{epochs} - Train Loss: {train_loss}")
 
-        test_loss = evaluate_loss(model, criterion, valloader, device)
-        test_losses.append(test_loss)
-        print(f"Epoch {epoch + 1}/{epochs} - Val Loss: {test_loss}")
+        train_accuracy = (running_correct / running_total) * 100
+        print(f"Epoch {epoch + 1}/{epochs} - Train Accuracy: {train_accuracy:.2f}%")
 
-        test_accuracy = evaluate_accuracy(model, valloader, device)
-        print(f"Epoch {epoch + 1}/{epochs} - Val Accuracy: {test_accuracy:.2f}%")
+        val_loss = evaluate_loss(model, criterion, valloader, device)
+        val_losses.append(val_loss)
+        print(f"Epoch {epoch + 1}/{epochs} - Val Loss: {val_loss}")
 
-    return train_losses, test_losses
+        val_accuracy = evaluate_accuracy(model, valloader, device)
+        print(f"Epoch {epoch + 1}/{epochs} - Val Accuracy: {val_accuracy:.2f}%")
+
+        if on_epoch_end is not None:
+            on_epoch_end(
+                {
+                    "epoch": epoch + 1,
+                    "train_loss": train_loss,
+                    "train_acc": train_accuracy,
+                    "val_loss": val_loss,
+                    "val_acc": val_accuracy,
+                }
+            )
+
+    return train_losses, val_losses

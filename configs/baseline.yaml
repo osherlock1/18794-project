@@ -1,0 +1,16 @@
+data_file_name: sequences_noface.npy
+
+model: 'CNNTransformer' # match with the keys in MODELS in run_training.py
+device: 'mps'
+batch_size: 64
+epochs: 5
+seed: 42
+
+optimizer:
+  name: adam
+  lr: 1.0e-4
+  weight_decay: 0.0
+
+criterion:
+  name: cross_entropy
+  label_smoothing: 0.0

@@ -7,3 +7,5 @@ __pycache__
 /build
 notes.txt
 .DS_Store
+wandb/
+weights/

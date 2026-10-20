@@ -6,10 +6,10 @@ from torch.utils.data import Dataset
 
 
 class ASLDataset(Dataset):
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, sequence_file_name: str = "sequences.npy"):
         data_dir = Path(data_dir)
 
-        self.sequences = np.load(data_dir / "sequences.npy", mmap_mode="r")
+        self.sequences = np.load(data_dir / sequence_file_name, mmap_mode="r")
         self.labels = np.load(data_dir / "labels.npy", mmap_mode="r")
 
         if len(self.sequences) != len(self.labels):

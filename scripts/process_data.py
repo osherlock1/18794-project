@@ -11,11 +11,11 @@ from src.data import get_frames, resize_sequence
 BASE_PATH = Path(__file__).parent.parent
 DATASET_PATH = BASE_PATH / "data" / "asl-signs"
 TRAIN_CSV_PATH = DATASET_PATH / "train.csv"
-CLEANED_FILE_NAME = "sequences_noface.npy"
+CLEANED_FILE_NAME = "sequences_noface_128.npy"
 CLEANED_SAVE_PATH = BASE_PATH / "data" / "asl-signs" / "cleaned"
 N_FEATURES = 150
 
-N_FRAME = 64
+N_FRAME = 128
 
 
 def process_file(path):

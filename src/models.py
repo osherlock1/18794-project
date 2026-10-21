@@ -45,15 +45,15 @@ class CNNEmbedder(nn.Module):
 
         self.features = nn.Sequential(
             nn.Conv1d(
-                in_channels=150, out_channels=192, kernel_size=5, stride=1, padding=8
+                in_channels=150, out_channels=192, kernel_size=5, stride=1, padding=2
             ),
             nn.LeakyReLU(negative_slope=0.01),
             nn.Conv1d(
-                in_channels=192, out_channels=192, kernel_size=5, stride=1, padding=8
+                in_channels=192, out_channels=192, kernel_size=5, stride=1, padding=2
             ),
             nn.LeakyReLU(negative_slope=0.01),
             nn.Conv1d(
-                in_channels=192, out_channels=192, kernel_size=5, padding=8, stride=1
+                in_channels=192, out_channels=192, kernel_size=5, padding=2, stride=1
             ),
             nn.LeakyReLU(negative_slope=0.01),
             nn.MaxPool1d(kernel_size=2),
@@ -84,14 +84,13 @@ class CNNTransformer(nn.Module):
         )
 
     def forward(self, x):
-
         x = x.transpose(1, 2)
         x = self.embedder.features(x)
         x = x.transpose(1, 2)
 
         time_steps = x.size(1)
         if time_steps > self.position.size(1):
-            raise ValueError("Sequence exceeds max_toxens")
+            raise ValueError("something is wrong with the sizes")
 
         x = x + self.position[:, :time_steps]
         x = self.encoder(x)

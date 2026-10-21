@@ -1,5 +1,6 @@
 import json
 import os
+from multiprocessing import Pool
 from pathlib import Path
 
 import numpy as np
@@ -15,6 +16,13 @@ CLEANED_SAVE_PATH = BASE_PATH / "data" / "asl-signs" / "cleaned"
 N_FEATURES = 150
 
 N_FRAME = 64
+
+
+def process_file(path):
+    p_df = pd.read_parquet(
+        DATASET_PATH / path, columns=["frame", "type", "landmark_index", "x", "y"]
+    )
+    return resize_sequence(get_frames(p_df), N_FRAME)
 
 
 def main():
@@ -41,21 +49,16 @@ def main():
     )
 
     print("Data cleaning started...")
-    for i, (path, participant_id, sequence_id, sign) in enumerate(
-        train_df.itertuples(index=False)
-    ):
-        file_path = BASE_PATH / "data" / "asl-signs" / path
-        p_df = pd.read_parquet(file_path)
-        frame_data = get_frames(p_df)
-        sequence = resize_sequence(frame_data, N_FRAME)
+    with Pool() as pool:
+        results = pool.imap(process_file, train_df["path"], chunksize=64)
+        for i, sequence in enumerate(results):
+            if sequence.shape != (N_FRAME, N_FEATURES):
+                raise ValueError(f"Unexpected sequence shape at row{i}")
 
-        if sequence.shape != (N_FRAME, N_FEATURES):
-            raise ValueError(f"Unexpected sequence shape at row{i}")
+            x[i] = sequence
 
-        x[i] = sequence
-
-        if i % 1000 == 0:
-            print(f"{i}/{len(train_df)}")
+            if i % 1000 == 0:
+                print(f"{i}/{len(train_df)}")
 
     x.flush()
     print("Data cleaning finished!")

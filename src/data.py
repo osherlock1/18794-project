@@ -2,16 +2,12 @@ import numpy as np
 import pandas as pd
 
 
-def get_frames(parquet_frame: pd.DataFrame, exclude_types=("face",)) -> pd.DataFrame:
+def get_frames(parquet_frame: pd.DataFrame, exclude_types=("face",)) -> np.ndarray:
     parquet_frame = parquet_frame[~parquet_frame["type"].isin(exclude_types)]
-    frames = []
+    ordered = parquet_frame.sort_values(["frame", "type", "landmark_index"])
+    n_frames = ordered["frame"].nunique()
 
-    for _, frame_df in parquet_frame.groupby("frame", sort=True):
-        ordered = frame_df.sort_values(["type", "landmark_index"])
-        features = ordered[["x", "y"]].to_numpy(dtype="float32").reshape(-1)
-        frames.append(features)
-
-    return np.stack(frames)
+    return ordered[["x", "y"]].to_numpy(dtype="float32").reshape(n_frames, -1)
 
 
 # NOTE: In order to have the same amount of frames for ever sequence the current solution

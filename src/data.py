@@ -24,3 +24,18 @@ def resize_sequence(sequence, target_frames=24):
     indicies = np.rint(np.linspace(0, len(sequence) - 1, target_frames)).astype(int)
 
     return sequence[indicies]
+
+
+def pad_sequence(sequence, target_frames=64, pad_value=0.0):
+    if len(sequence) == 0:
+        raise ValueError("Sequence has no frames")
+
+    sequence = sequence[:target_frames]
+    length = len(sequence)
+
+    padded = np.full(
+        (target_frames, sequence.shape[1]), pad_value, dtype=sequence.dtype
+    )
+    padded[:length] = sequence
+
+    return padded, length

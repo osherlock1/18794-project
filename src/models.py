@@ -3,7 +3,7 @@ from torch import nn
 
 
 class CNNBase(nn.Module):
-    def __init__(self):
+    def __init__(self, n_frames=64):
         super().__init__()
 
         self.features = nn.Sequential(
@@ -24,7 +24,7 @@ class CNNBase(nn.Module):
 
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=192 * 32, out_features=256 * 2),
+            nn.Linear(in_features=192 * (n_frames // 2), out_features=256 * 2),
             nn.LeakyReLU(negative_slope=0.01),
             nn.Dropout(0.2),
             nn.Linear(in_features=256 * 2, out_features=250),
@@ -61,12 +61,12 @@ class CNNEmbedder(nn.Module):
 
 
 class CNNTransformer(nn.Module):
-    def __init__(self):
+    def __init__(self, n_frames=64):
         super().__init__()
 
         self.embedder = CNNEmbedder()
 
-        self.position = nn.Parameter(torch.randn(1, 50, 192) * 0.02)
+        self.position = nn.Parameter(torch.randn(1, n_frames // 2, 192) * 0.02)
 
         layer = nn.TransformerEncoderLayer(
             d_model=192,

@@ -1,4 +1,5 @@
 data_file_name: sequences_noface.npy
+n_frames : 128
 
 model: 'CNNTransformer' # match with the keys in MODELS in run_training.py (this goes for optimizer and criterion)
 device: 'mps'

@@ -44,6 +44,12 @@ def main():
 
     dataset = ASLDataset(DATASET_PATH, sequence_file_name=config["data_file_name"])
 
+    data_frames = dataset.sequences.shape[1]
+    if data_frames != config["n_frames"]:
+        raise ValueError(
+            f"Config n_frames is {config['n_frames']} but {config['data_file_name']} has {data_frames} frames"
+        )
+
     if config["device"] == "mps":
         device = "mps" if torch.mps.is_available() else "cpu"
 
@@ -94,7 +100,7 @@ def main():
         num_workers=0,
     )
 
-    model = MODELS[config["model"]]()
+    model = MODELS[config["model"]](n_frames=config["n_frames"])
 
     optimizer_config = dict(config["optimizer"])
     optimizer_class = OPTIMIZERS[optimizer_config.pop("name")]

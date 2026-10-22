@@ -1,5 +1,7 @@
+import argparse
 import json
 import os
+from functools import partial
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -11,22 +13,40 @@ from src.data import get_frames, resize_sequence
 BASE_PATH = Path(__file__).parent.parent
 DATASET_PATH = BASE_PATH / "data" / "asl-signs"
 TRAIN_CSV_PATH = DATASET_PATH / "train.csv"
-CLEANED_FILE_NAME = "sequences_noface_128.npy"
-CLEANED_SAVE_PATH = BASE_PATH / "data" / "asl-signs" / "cleaned"
+CLEANED_SAVE_PATH = DATASET_PATH / "cleaned"
 N_FEATURES = 150
 
-N_FRAME = 128
 
-
-def process_file(path):
+def process_file(path, n_frames):
     p_df = pd.read_parquet(
         DATASET_PATH / path, columns=["frame", "type", "landmark_index", "x", "y"]
     )
-    return resize_sequence(get_frames(p_df), N_FRAME)
+    return resize_sequence(get_frames(p_df), n_frames)
 
 
 def main():
-    os.makedirs(CLEANED_SAVE_PATH, exist_ok=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--n-frames",
+        "-n",
+        type=int,
+        required=True,
+        help="Number of frames each sequence is resized to",
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=str,
+        required=True,
+        help="File name of the .npy to save the sequences to. Saved in the cleaned dir along with labels.npy",
+    )
+    args = parser.parse_args()
+
+    n_frames = args.n_frames
+    save_dir = CLEANED_SAVE_PATH
+    output_path = save_dir / args.output
+
+    os.makedirs(save_dir, exist_ok=True)
     with open(DATASET_PATH / "sign_to_prediction_index_map.json", "r") as f:
         sign_to_index = json.load(f)
 
@@ -37,22 +57,24 @@ def main():
         raise ValueError("Some signs are missing from the labels map")
 
     np.save(
-        CLEANED_SAVE_PATH / "labels.npy",
+        save_dir / "labels.npy",
         label_ids.to_numpy(dtype=np.int64),
     )
 
     x = np.lib.format.open_memmap(
-        CLEANED_SAVE_PATH / CLEANED_FILE_NAME,
+        output_path,
         mode="w+",
         dtype=np.float32,
-        shape=(len(train_df), N_FRAME, N_FEATURES),
+        shape=(len(train_df), n_frames, N_FEATURES),
     )
 
     print("Data cleaning started...")
     with Pool() as pool:
-        results = pool.imap(process_file, train_df["path"], chunksize=64)
+        results = pool.imap(
+            partial(process_file, n_frames=n_frames), train_df["path"], chunksize=64
+        )
         for i, sequence in enumerate(results):
-            if sequence.shape != (N_FRAME, N_FEATURES):
+            if sequence.shape != (n_frames, N_FEATURES):
                 raise ValueError(f"Unexpected sequence shape at row{i}")
 
             x[i] = sequence

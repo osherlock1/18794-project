@@ -1,4 +1,4 @@
-data_file_name: sequences_noface.npy
+data_file_name: sequences_noface_128.npy
 n_frames : 128
 
 model: 'CNNTransformer' # match with the keys in MODELS in run_training.py (this goes for optimizer and criterion)
